@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import './App.scss';
 
+import type { User } from './types/User';
 import type { Todo } from './types/Todo';
+
 import todosFromServer from './api/todos';
+import usersFromServer from './api/users';
 
 import { TodoForm } from './components/TodoForm';
 import { TodoList } from './components/TodoList';
 
-import { getUserById } from './functions/user';
+export function getUserById(userId: number): User | null {
+  return usersFromServer.find(user => user.id === userId) || null;
+}
 
 function getNewTodoId(todos: Todo[]) {
-  const maxTodoId = Math.max(...todos.map(todo => todo.id));
-
-  return maxTodoId + 1;
+  return todos.length ? Math.max(...todos.map(todo => todo.id)) + 1 : 1;
 }
 
 const initialTodos: Todo[] = todosFromServer.map(todo => ({
@@ -23,18 +26,29 @@ const initialTodos: Todo[] = todosFromServer.map(todo => ({
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>(initialTodos);
 
-  const onAdd = (todoInfo: Todo) => {
-    const newTodo = { ...todoInfo };
-
-    newTodo.id = getNewTodoId(todos);
+  const onAdd = (title: string, userId: number) => {
+    const newTodo = {
+      id: getNewTodoId(todos),
+      title,
+      userId,
+      completed: false,
+      user: getUserById(userId),
+    };
 
     setTodos((currentTodos: Todo[]) => [...currentTodos, newTodo]);
   };
 
+  // const onAdd = (todoInfo: Todo) => {
+  //   const newTodo = { ...todoInfo };
+
+  //   newTodo.id = getNewTodoId(todos);
+
+  //   setTodos((currentTodos: Todo[]) => [...currentTodos, newTodo]);
+  // };
   return (
     <div className="App">
       <h1>Add todo form</h1>
-      <TodoForm onAdd={onAdd} />
+      <TodoForm onAdd={onAdd} users={usersFromServer} />
       <TodoList todos={todos} />
     </div>
   );
