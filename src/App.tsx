@@ -27,24 +27,20 @@ export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>(initialTodos);
 
   const onAdd = (title: string, userId: number) => {
-    const newTodo = {
-      id: getNewTodoId(todos),
-      title,
-      userId,
-      completed: false,
-      user: getUserById(userId),
-    };
+    setTodos((currentTodos: Todo[]) => {
+      const id = getNewTodoId(currentTodos);
+      const newTodo = {
+        id,
+        title,
+        userId,
+        completed: false,
+        user: getUserById(userId),
+      };
 
-    setTodos((currentTodos: Todo[]) => [...currentTodos, newTodo]);
+      return [...currentTodos, newTodo];
+    });
   };
 
-  // const onAdd = (todoInfo: Todo) => {
-  //   const newTodo = { ...todoInfo };
-
-  //   newTodo.id = getNewTodoId(todos);
-
-  //   setTodos((currentTodos: Todo[]) => [...currentTodos, newTodo]);
-  // };
   return (
     <div className="App">
       <h1>Add todo form</h1>
